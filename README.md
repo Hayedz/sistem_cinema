@@ -1,41 +1,71 @@
 # sistem_cinema
-🎬 Dokumentasi Sistem Basis Data
-Sistem Informasi Perfilman – db_cinema
+# 🎬 DB_CINEMA – Sistem Basis Data Perfilman
 
-Database ini dibuat menggunakan MariaDB 10.4.32 melalui XAMPP.
-Tujuan sistem ini adalah untuk mengelola data film, sutradara, dan genre secara terstruktur menggunakan relasi antar tabel.
+Database ini dibuat menggunakan **MariaDB 10.4.32** melalui XAMPP.
+Tujuan proyek ini adalah mengimplementasikan konsep **Relational Database** dan operasi **SQL JOIN** pada sistem manajemen data film.
 
-🏗️ 1. Perancangan Struktur Database
-1.1 Pembuatan Database
+---
+
+## 📌 Deskripsi Sistem
+
+`db_cinema` merupakan database sederhana yang mengelola:
+
+* 🎥 Data Sutradara
+* 🎭 Data Genre
+* 🎞️ Data Film
+* 🔗 Relasi antar tabel menggunakan Foreign Key
+
+Sistem ini dibuat untuk memahami:
+
+* Struktur tabel relasional
+* Implementasi foreign key
+* Penggunaan INNER JOIN, LEFT JOIN, dan RIGHT JOIN
+
+---
+
+# 🏗️ Struktur Database
+
+## 1️⃣ Database
+
+```sql
 CREATE DATABASE db_cinema;
 USE db_cinema;
+```
 
-Database db_cinema digunakan sebagai pusat penyimpanan seluruh data perfilman.
+---
 
-1.2 Struktur Tabel
-🎥 Tabel sutradara
+## 2️⃣ Tabel `sutradara`
 
-Tabel ini menyimpan informasi pembuat film.
-
+```sql
 CREATE TABLE sutradara (
     id_sutradara INT PRIMARY KEY AUTO_INCREMENT,
     nama_sutradara VARCHAR(100),
     negara_asal VARCHAR(50),
     tahun_lahir INT
 );
-🎭 Tabel genre
+```
 
-Tabel ini menyimpan kategori atau jenis film.
+Menyimpan informasi sutradara film.
 
+---
+
+## 3️⃣ Tabel `genre`
+
+```sql
 CREATE TABLE genre (
     id_genre INT PRIMARY KEY AUTO_INCREMENT,
     nama_genre VARCHAR(50),
     keterangan TEXT
 );
-🎞️ Tabel film
+```
 
-Tabel utama yang menyimpan data film dan memiliki relasi ke sutradara dan genre.
+Menyimpan kategori film.
 
+---
+
+## 4️⃣ Tabel `film`
+
+```sql
 CREATE TABLE film (
     id_film INT PRIMARY KEY AUTO_INCREMENT,
     judul_film VARCHAR(150),
@@ -46,54 +76,46 @@ CREATE TABLE film (
     FOREIGN KEY (id_sutradara) REFERENCES sutradara(id_sutradara),
     FOREIGN KEY (id_genre) REFERENCES genre(id_genre)
 );
-📌 Analisis Relasi
+```
 
-Satu sutradara dapat menyutradarai banyak film (1:M)
+### 🔗 Relasi
 
-Satu genre dapat memiliki banyak film (1:M)
+* 1 Sutradara → Banyak Film (1:M)
+* 1 Genre → Banyak Film (1:M)
+* 1 Film → 1 Sutradara
+* 1 Film → 1 Genre
 
-Setiap film memiliki satu sutradara dan satu genre
+---
 
-📥 2. Pengisian Data
+# 📥 Contoh Data
 
-Data berhasil dimasukkan ke masing-masing tabel:
+## Sutradara
 
-Contoh Sutradara:
+* Christopher Nolan
+* Joko Anwar
+* Bong Joon-ho
+* Steven Spielberg
+* Greta Gerwig
+* Denis Villeneuve
+* Martin Scorsese
 
-Christopher Nolan
+## Film
 
-Joko Anwar
+* Inception
+* Parasite
+* Barbie
+* Dune
+* The Irishman
+* Jurassic Park
+* Pengabdi Setan
 
-Bong Joon-ho
+---
 
-Steven Spielberg
+# 🔗 Implementasi JOIN
 
-Greta Gerwig
+## 🟢 INNER JOIN
 
-Denis Villeneuve
-
-Martin Scorsese
-
-Contoh Film:
-
-Inception
-
-Parasite
-
-Barbie
-
-Dune
-
-The Irishman
-
-Jurassic Park
-
-Pengabdi Setan
-
-Semua data saling terhubung melalui foreign key.
-
-🔗 3. Implementasi JOIN
-🟢 3.1 INNER JOIN
+```sql
 SELECT film.judul_film,
        sutradara.nama_sutradara,
        genre.nama_genre,
@@ -103,56 +125,48 @@ INNER JOIN sutradara
     ON film.id_sutradara = sutradara.id_sutradara
 INNER JOIN genre
     ON film.id_genre = genre.id_genre;
-📖 Penjelasan
+```
 
-INNER JOIN menampilkan hanya data yang memiliki pasangan di semua tabel yang dihubungkan.
+**Penjelasan:**
+Menampilkan hanya data yang memiliki relasi di semua tabel.
 
-Hasil:
+---
 
-Setiap film ditampilkan bersama nama sutradara dan genre-nya.
+## 🟡 LEFT JOIN
 
-Data yang tidak memiliki relasi tidak akan muncul.
-
-🟢 3.2 LEFT JOIN
-
-Setelah menambahkan satu sutradara baru yang belum memiliki film:
-
+```sql
 SELECT sutradara.nama_sutradara, film.judul_film
 FROM sutradara
 LEFT JOIN film
 ON sutradara.id_sutradara = film.id_sutradara;
-📖 Penjelasan
+```
 
-LEFT JOIN menampilkan seluruh data dari tabel kiri (sutradara), meskipun tidak memiliki pasangan di tabel kanan (film).
+**Penjelasan:**
+Menampilkan semua sutradara, meskipun belum memiliki film.
 
-Jika tidak memiliki film, maka kolom judul_film akan bernilai NULL.
+---
 
-🟢 3.3 RIGHT JOIN
+## 🔵 RIGHT JOIN
+
+```sql
 SELECT genre.nama_genre, film.judul_film
 FROM genre
 RIGHT JOIN film
 ON genre.id_genre = film.id_genre;
-📖 Penjelasan
+```
 
-RIGHT JOIN menampilkan seluruh data dari tabel kanan (film), meskipun tidak memiliki pasangan di tabel kiri (genre).
+**Penjelasan:**
+Menampilkan semua film, meskipun tidak memiliki genre.
 
-Jika film tidak memiliki genre, maka kolom nama_genre akan bernilai NULL.
+---
 
-📊 4. Ringkasan Perbedaan JOIN
-Jenis JOIN	Hasil yang Ditampilkan
-INNER JOIN	Data yang cocok di kedua tabel
-LEFT JOIN	Semua data kiri + yang cocok di kanan
-RIGHT JOIN	Semua data kanan + yang cocok di kiri
-🧩 5. Kesimpulan
+# 📊 Perbedaan JOIN
 
-Database db_cinema berhasil mengimplementasikan:
+| JOIN       | Fungsi                             |
+| ---------- | ---------------------------------- |
+| INNER JOIN | Data yang cocok di kedua tabel     |
+| LEFT JOIN  | Semua data kiri + yang cocok kanan |
+| RIGHT JOIN | Semua data kanan + yang cocok kiri |
 
-Struktur tabel relasional
+---
 
-Foreign key sebagai penghubung antar tabel
-
-Operasi INNER JOIN, LEFT JOIN, dan RIGHT JOIN
-
-Pengelolaan data film secara terintegrasi
-
-Melalui implementasi ini, konsep dasar relasi dalam basis data dapat dipahami dengan jelas, terutama dalam penggunaan JOIN untuk menggabungkan informasi dari beberapa tabel.
